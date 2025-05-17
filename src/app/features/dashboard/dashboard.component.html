@@ -1,0 +1,36 @@
+<!-- src/app/features/dashboard/dashboard.component.html -->
+<div class="p-6">
+  <div class="bg-white rounded-lg shadow p-6">
+    <!-- Header with title and logout button -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Dashboard</h1>
+      <button 
+        (click)="logout()" 
+        mat-raised-button
+        color="warn">
+        Logout
+      </button>
+    </div>
+    
+    <!-- User information section - only shows if user data exists -->
+    <div *ngIf="user$ | async as user" class="p-4 rounded-lg border">
+      <h2 class="text-xl font-semibold mb-4">Welcome, {{ user.name }}</h2>
+      <p><strong>Username:</strong> {{ user.username }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Role:</strong> {{ user.role }}</p>
+      
+      <!-- Organization info - only shows if exists -->
+      <div *ngIf="user.organizationName" class="mt-4">
+        <p><strong>Organization:</strong> {{ user.organizationName }}</p>
+      </div>
+      
+      <!-- Permissions list -->
+      <div class="mt-4">
+        <p><strong>Permissions:</strong></p>
+        <ul class="list-disc pl-5">
+          <li *ngFor="let permission of user.permissions">{{ permission }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
