@@ -5,3 +5,26 @@ html, body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+/* Custom button styling */
+.mat-mdc-raised-button.mat-primary {
+  @apply bg-blue-600;
+}
+
+.mat-mdc-raised-button.mat-primary:hover {
+  @apply bg-blue-700;
+}
+
+/* Override Material form field styles to fit better with Tailwind */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Better form field label colors */
+.mat-form-field-label {
+  @apply text-gray-600;
+}
+
+/* Customize form field appearance */
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  @apply text-gray-300;
+}

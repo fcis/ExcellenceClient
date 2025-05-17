@@ -4,10 +4,11 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { LoginRequest, AuthResponse, User } from '../models/auth.models';
+import { ApiResponse } from '../models/api-response.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root' // This makes the service a singleton available throughout the app
+  providedIn: 'root'
 })
 export class AuthService {
   // Storage keys for local storage
@@ -15,7 +16,7 @@ export class AuthService {
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly USER_KEY = 'user_data';
   
-  // BehaviorSubject to track the current user - emits the current value to new subscribers
+  // BehaviorSubject to track the current user
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   // Public observable that components can subscribe to
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -41,12 +42,26 @@ export class AuthService {
       try {
         // Parse the stored user data
         const user = JSON.parse(userData) as User;
-        this.currentUserSubject.next(user);
-        this.isAuthenticatedSubject.next(true);
+        
+        // Debug: Verify the user data before setting it
+        console.log('Loading user from storage:', user);
+        
+        // If we have a valid user object with required fields, set it
+        if (user && user.id && user.username) {
+          this.currentUserSubject.next(user);
+          this.isAuthenticatedSubject.next(true);
+          console.log('User successfully loaded from storage:', user);
+        } else {
+          console.error('Invalid user data in storage:', user);
+          this.logout(); // Clear invalid data
+        }
       } catch (error) {
+        console.error('Error parsing user data from storage:', error);
         // If there's an error parsing, log the user out
         this.logout();
       }
+    } else {
+      console.log('No user data found in storage. Token exists:', !!token, 'User data exists:', !!userData);
     }
   }
 
@@ -56,14 +71,44 @@ export class AuthService {
    * @returns An observable of the User if login is successful
    */
   login(credentials: LoginRequest): Observable<User> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/api/Auth/login`, credentials)
+    console.log('Login attempt with credentials:', credentials);
+    
+    return this.http.post<ApiResponse<AuthResponse>>(`${environment.apiUrl}/api/Auth/login`, credentials)
       .pipe(
+        // Log the raw response for debugging
+        tap(response => console.log('Raw login response:', response)),
+        
+        // Extract the data from the ApiResponse wrapper
+        map(response => {
+          if (!response.success) {
+            console.error('Login failed:', response.message, response.errors);
+            throw new Error(response.message || 'Login failed');
+          }
+          
+          // Ensure the data property exists
+          if (!response.data) {
+            console.error('No data property in successful response:', response);
+            throw new Error('Invalid server response format');
+          }
+          
+          return response.data;
+        }),
+        
+        // Log the extracted data
+        tap(authResponse => console.log('Extracted auth response:', authResponse)),
+        
         // If login succeeds, save the auth data
-        tap(response => this.handleAuthSuccess(response)),
+        tap(authResponse => this.handleAuthSuccess(authResponse)),
+        
         // Transform the response to just the User object
-        map(response => this.mapResponseToUser(response)),
+        map(authResponse => this.mapResponseToUser(authResponse)),
+        
+        // Log the mapped user
+        tap(user => console.log('Mapped user from auth response:', user)),
+        
         // Handle any errors
         catchError(error => {
+          console.error('Login error:', error);
           return throwError(() => error);
         })
       );
@@ -106,14 +151,26 @@ export class AuthService {
    * Handles successful authentication by storing tokens and user data
    */
   private handleAuthSuccess(response: AuthResponse): void {
+    console.log('Handling auth success with response:', response);
+    
+    // Store the tokens in local storage
     localStorage.setItem(this.TOKEN_KEY, response.token);
     localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
     
+    // Map the response to a user object
     const user = this.mapResponseToUser(response);
+    console.log('Mapped user object:', user);
+    
+    // Store the user data in local storage
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     
+    // Update the BehaviorSubjects
     this.currentUserSubject.next(user);
     this.isAuthenticatedSubject.next(true);
+    
+    // Verify the current state of the subject
+    console.log('Current user subject value after login:', this.currentUserSubject.value);
+    console.log('Is authenticated subject value after login:', this.isAuthenticatedSubject.value);
   }
 
   /**

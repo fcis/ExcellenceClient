@@ -12,19 +12,22 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-login',
-  standalone: true, // This makes it a standalone component (no need for NgModule)
+  standalone: true,
   imports: [
-    // Import all the modules this component needs
     CommonModule,
     ReactiveFormsModule,
     MatCardModule,
     MatInputModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatIconModule,
+    MatCheckboxModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -38,6 +41,8 @@ export class LoginComponent implements OnInit {
   error: string | null = null;
   // URL to redirect to after login
   returnUrl: string = '/';
+  // Toggle password visibility
+  hidePassword = true;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -53,7 +58,7 @@ export class LoginComponent implements OnInit {
     // Initialize the login form
     this.initForm();
     // Get the return URL from route parameters or default to '/'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
     
     // If already logged in, redirect to returnUrl
     this.authService.isAuthenticated$.subscribe(isAuthenticated => {
@@ -68,8 +73,8 @@ export class LoginComponent implements OnInit {
    */
   private initForm(): void {
     this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]], // Email field with validation
-      password: ['', [Validators.required, Validators.minLength(6)]] // Password field with validation
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -77,6 +82,12 @@ export class LoginComponent implements OnInit {
    * Handles form submission
    */
   onSubmit(): void {
+    // Mark form controls as touched to trigger validation
+    Object.keys(this.loginForm.controls).forEach(key => {
+      const control = this.loginForm.get(key);
+      control?.markAsTouched();
+    });
+
     // Don't submit if the form is invalid
     if (this.loginForm.invalid) {
       return;
@@ -86,6 +97,8 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
 
+    console.log('Submitting login form with:', this.loginForm.value);
+
     // Call the auth service login method
     this.authService.login(this.loginForm.value)
       .pipe(
@@ -94,18 +107,49 @@ export class LoginComponent implements OnInit {
       )
       .subscribe({
         // Handle successful login
-        next: () => {
+        next: (user) => {
+          console.log('Login successful, received user:', user);
+          // Verify the user data is stored correctly
+          const storedUser = localStorage.getItem('user_data');
+          console.log('User data stored in localStorage:', storedUser);
+          
           this.router.navigateByUrl(this.returnUrl);
         },
         // Handle login error
         error: (error) => {
+          console.error('Login error details:', error);
+          
           if (error.status === 401) {
             this.error = 'Invalid email or password';
+          } else if (error.error && error.error.message) {
+            // Extract error message from API response
+            this.error = error.error.message;
+          } else if (error.message) {
+            this.error = error.message;
           } else {
             this.error = 'An error occurred. Please try again later.';
           }
-          console.error('Login error:', error);
         }
       });
+  }
+
+  /**
+   * Fills in admin demo credentials
+   */
+  fillAdminCredentials(): void {
+    this.loginForm.patchValue({
+      email: 'admin@example.com',
+      password: 'Admin@123'
+    });
+  }
+
+  /**
+   * Fills in organization user demo credentials
+   */
+  fillOrgCredentials(): void {
+    this.loginForm.patchValue({
+      email: 'orguser@example.com',
+      password: 'User123!'
+    });
   }
 }
