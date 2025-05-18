@@ -1,0 +1,31 @@
+/* src/app/features/auth/login/login.component.scss */
+
+/* Custom gradient background */
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* Ensure the spinner is styled correctly */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Additional customizations */
+.from-indigo-300.via-purple-300.to-pink-300 {
+  background: linear-gradient(135deg, #a5b4fc, #c4b5fd, #f9a8d4);
+}
+
+/* Add a subtle shadow to the login card */
+.shadow-lg {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}

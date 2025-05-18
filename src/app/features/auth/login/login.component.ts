@@ -6,28 +6,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { finalize } from 'rxjs/operators';
 
-// Angular Material imports
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatInputModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatProgressSpinnerModule,
-    MatIconModule,
-    MatCheckboxModule
+    ReactiveFormsModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -109,10 +93,6 @@ export class LoginComponent implements OnInit {
         // Handle successful login
         next: (user) => {
           console.log('Login successful, received user:', user);
-          // Verify the user data is stored correctly
-          const storedUser = localStorage.getItem('user_data');
-          console.log('User data stored in localStorage:', storedUser);
-          
           this.router.navigateByUrl(this.returnUrl);
         },
         // Handle login error
@@ -134,22 +114,17 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Fills in admin demo credentials
+   * Handle cancel button click
    */
-  fillAdminCredentials(): void {
-    this.loginForm.patchValue({
-      email: 'admin@example.com',
-      password: 'Admin@123'
-    });
+  cancel(): void {
+    // Just reset the form or navigate away as needed
+    this.loginForm.reset();
   }
 
   /**
-   * Fills in organization user demo credentials
+   * Toggles password visibility
    */
-  fillOrgCredentials(): void {
-    this.loginForm.patchValue({
-      email: 'orguser@example.com',
-      password: 'User123!'
-    });
+  togglePasswordVisibility(): void {
+    this.hidePassword = !this.hidePassword;
   }
 }
