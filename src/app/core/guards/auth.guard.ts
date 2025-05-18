@@ -8,7 +8,7 @@ import {
 } from '@angular/router';
 import { inject } from '@angular/core';
 import { map, take } from 'rxjs';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../services/auth.service';
 
 /**
  * This is a functional guard that protects routes from unauthenticated access
