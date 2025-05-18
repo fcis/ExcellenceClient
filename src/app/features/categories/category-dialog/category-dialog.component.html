@@ -1,0 +1,53 @@
+<!-- src/app/features/categories/category-dialog/category-dialog.component.html -->
+<div class="p-6">
+  <h2 class="text-xl font-semibold mb-6">{{ dialogTitle }}</h2>
+  
+  <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+    <div class="mb-4">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Category Name</mat-label>
+        <input matInput formControlName="name" placeholder="Enter category name">
+        <mat-error *ngIf="categoryForm.get('name')?.errors?.['required']">
+          Category name is required
+        </mat-error>
+        <mat-error *ngIf="categoryForm.get('name')?.errors?.['maxlength']">
+          Category name cannot exceed 100 characters
+        </mat-error>
+      </mat-form-field>
+    </div>
+    
+    <div class="mb-6">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Description</mat-label>
+        <textarea 
+          matInput 
+          formControlName="description" 
+          placeholder="Enter category description"
+          rows="4">
+        </textarea>
+        <mat-error *ngIf="categoryForm.get('description')?.errors?.['required']">
+          Description is required
+        </mat-error>
+        <mat-error *ngIf="categoryForm.get('description')?.errors?.['maxlength']">
+          Description cannot exceed 500 characters
+        </mat-error>
+      </mat-form-field>
+    </div>
+    
+    <div class="flex justify-end space-x-3">
+      <button 
+        type="button"
+        (click)="onCancel()"
+        class="border border-gray-300 text-gray-700 px-4 py-2 rounded-md">
+        Cancel
+      </button>
+      <button 
+        type="submit"
+        [disabled]="categoryForm.invalid"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-md"
+        [class.opacity-50]="categoryForm.invalid">
+        {{ data.isEdit ? 'Update' : 'Create' }}
+      </button>
+    </div>
+  </form>
+</div>

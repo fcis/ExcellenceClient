@@ -28,11 +28,11 @@ export const routes: Routes = [
       //   loadComponent: () => import('').then(c => c.FrameworksComponent),
       //   title: 'Frameworks - Tharwah Excellence'
       // },
-      // {
-      //   path: 'categories',
-      //   loadComponent: () => import('../app/shared/not-found').then(c => c.CategoriesComponent),
-      //   title: 'Categories - Tharwah Excellence'
-      // },
+{
+        path: 'categories',
+        loadComponent: () => import('./features/categories/categories.component').then(c => c.CategoriesComponent),
+        title: 'Categories - Tharwah Excellence'
+      },
       // {
       //   path: 'clauses',
       //   loadComponent: () => import('./features/clauses/clauses.component').then(c => c.ClausesComponent),
