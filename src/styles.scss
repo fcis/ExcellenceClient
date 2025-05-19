@@ -28,3 +28,48 @@ html, body {
 .mat-form-field-appearance-outline .mat-form-field-outline {
   @apply text-gray-300;
 }
+
+
+.side-drawer-dialog {
+  position: absolute !important;
+  margin: 0 !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  overflow-x: hidden !important;
+}
+
+.side-drawer-dialog .mat-mdc-dialog-container {
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Animation for dialog entrance and exit */
+.side-drawer-dialog .mat-mdc-dialog-container .mdc-dialog__container {
+  animation-name: slide-in;
+  animation-duration: 300ms;
+  animation-timing-function: ease-out;
+}
+
+.side-drawer-dialog.mat-mdc-dialog-exit .mat-mdc-dialog-container .mdc-dialog__container {
+  animation-name: slide-out;
+  animation-duration: 200ms;
+  animation-timing-function: ease-in;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}

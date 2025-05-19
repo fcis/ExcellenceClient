@@ -86,9 +86,14 @@ export class CategoriesComponent implements OnInit {
   getPageNumbers(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
-  addCategory(): void {
+ addCategory(): void {
     const dialogRef = this.dialog.open(CategoryDialogComponent, {
-      width: '500px',
+      width: '400px',
+      height: '100vh',
+      position: { right: '0' },
+      panelClass: 'side-drawer-dialog',
+      enterAnimationDuration: '300ms',
+      exitAnimationDuration: '200ms',
       data: { isEdit: false }
     });
 
@@ -109,7 +114,12 @@ export class CategoriesComponent implements OnInit {
 
   editCategory(category: Category): void {
     const dialogRef = this.dialog.open(CategoryDialogComponent, {
-      width: '500px',
+      width: '100%',
+      height: '100vh',
+      position: { right: '0' },
+      panelClass: 'side-drawer-dialog',
+      enterAnimationDuration: '300ms',
+      exitAnimationDuration: '200ms',
       data: { isEdit: true, category }
     });
 
